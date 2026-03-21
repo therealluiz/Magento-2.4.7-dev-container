@@ -1,0 +1,20 @@
+#!/bin/bash
+# Switch Magento deploy mode
+# Usage:
+#   bin/dev-mode              -> show current mode
+#   bin/dev-mode developer    -> switch to developer mode
+#   bin/dev-mode production   -> switch to production mode
+#   bin/dev-mode default      -> switch to default mode
+
+case "${1:-show}" in
+    show)
+        docker compose exec -u magento php php bin/magento deploy:mode:show
+        ;;
+    developer|production|default)
+        docker compose exec -u magento php php bin/magento deploy:mode:set "$1"
+        ;;
+    *)
+        echo "Usage: bin/dev-mode [show|developer|production|default]"
+        exit 1
+        ;;
+esac

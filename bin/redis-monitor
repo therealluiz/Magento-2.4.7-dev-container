@@ -1,0 +1,5 @@
+#!/bin/bash
+# Monitor Redis commands in real-time (Ctrl+C to stop)
+# Useful for debugging cache hits/misses
+echo "Monitoring Redis commands (Ctrl+C to stop)..."
+docker compose exec redis redis-cli monitor

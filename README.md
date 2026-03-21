@@ -46,18 +46,102 @@ Magento will be available at **http://localhost** (admin: http://localhost/admin
 
 ## Commands
 
+### General
+
 | Command | Description |
 |---------|-------------|
 | `bin/start` | Start all containers |
 | `bin/stop` | Stop all containers |
-| `bin/cli` | Shell into PHP container |
-| `bin/magento` | Run `bin/magento` commands |
+| `bin/restart` | Restart all (or `bin/restart php` for one service) |
+| `bin/status` | Show status of all containers |
+| `bin/setup` | First-time Magento installation |
+| `bin/destroy` | Remove containers (`--volumes` to wipe data) |
+| `bin/logs` | Tail all logs (`bin/logs php`, `bin/logs magento`) |
+| `bin/cli` | Shell into PHP container as magento user |
+| `bin/root` | Root shell (`bin/root php`, `bin/root db`, etc.) |
+
+### PHP Container
+
+| Command | Description |
+|---------|-------------|
+| `bin/php` | Run PHP commands |
 | `bin/composer` | Run Composer commands |
+| `bin/magento` | Run `bin/magento` commands |
+| `bin/magerun` | Run n98-magerun2 commands |
+| `bin/node` | Run Node.js commands |
+| `bin/npm` | Run npm commands |
+| `bin/grunt` | Run Grunt (Magento frontend workflow) |
+| `bin/phpunit` | Run PHPUnit tests |
+| `bin/phpcs` | Run PHP CodeSniffer |
+| `bin/phpcbf` | Run PHP Code Beautifier & Fixer |
+
+### Magento Workflow
+
+| Command | Description |
+|---------|-------------|
+| `bin/cache` | Flush cache (`flush`, `clean`, `status`, `enable`, `disable`) |
+| `bin/reindex` | Reindex all (`status`, `reset`, `info`) |
+| `bin/cron` | Run cron (`install`, `remove`, `group <name>`) |
+| `bin/deploy` | Deploy static content |
+| `bin/di-compile` | Run DI compilation |
+| `bin/upgrade` | Run `setup:upgrade` |
+| `bin/dev-mode` | Show/switch deploy mode (`developer`, `production`) |
+| `bin/module` | Module management (`status`, `enable`, `disable`) |
+| `bin/permissions` | Fix file/directory permissions |
+
+### Debugging
+
+| Command | Description |
+|---------|-------------|
 | `bin/xdebug on` | Enable step debugging (port 9003) |
 | `bin/xdebug off` | Disable Xdebug |
-| `bin/xdebug profile` | Enable Xdebug profiling |
-| `bin/spx on` | Enable SPX profiler |
+| `bin/xdebug profile` | Enable Xdebug profiling (cachegrind) |
+| `bin/xdebug trace` | Enable function tracing |
+| `bin/xdebug coverage` | Enable code coverage |
+| `bin/spx on` | Enable SPX profiler web UI |
 | `bin/spx off` | Disable SPX profiler |
+
+### MySQL
+
+| Command | Description |
+|---------|-------------|
+| `bin/mysql` | MySQL client (interactive or `bin/mysql -e "QUERY"`) |
+| `bin/mysqldump` | Dump database to stdout |
+| `bin/mysqladmin` | Run mysqladmin commands (`status`, `processlist`) |
+| `bin/db-import` | Import SQL file (`bin/db-import backup.sql` or `.sql.gz`) |
+| `bin/db-export` | Export DB to timestamped file (`--no-gzip` option) |
+
+### Redis
+
+| Command | Description |
+|---------|-------------|
+| `bin/redis` | redis-cli (`ping`, `info`, `dbsize`, `keys`, etc.) |
+| `bin/redis-flush` | Flush Redis (`cache`, `fpc`, `sessions`, `all`) |
+| `bin/redis-monitor` | Real-time Redis command monitor |
+
+### OpenSearch
+
+| Command | Description |
+|---------|-------------|
+| `bin/opensearch` | Query REST API (`_cat/indices?v`, etc.) |
+| `bin/opensearch-health` | Show cluster health + index summary |
+| `bin/opensearch-indices` | List indices (optional pattern filter) |
+
+### RabbitMQ
+
+| Command | Description |
+|---------|-------------|
+| `bin/rabbitmq` | Run rabbitmqctl commands |
+| `bin/rabbitmq-queues` | List queues with message counts |
+| `bin/rabbitmq-purge` | Purge queue (`<name>` or `--all`) |
+
+### Nginx
+
+| Command | Description |
+|---------|-------------|
+| `bin/nginx` | Run nginx commands (`-t`, `-T`, `-s reload`) |
+| `bin/nginx-reload` | Test and reload Nginx config |
+| `bin/nginx-logs` | Tail logs (`access`, `error`, or both) |
 
 ## Xdebug Setup
 

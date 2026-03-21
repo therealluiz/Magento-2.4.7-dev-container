@@ -1,0 +1,33 @@
+#!/bin/bash
+# Magento cache management shortcuts
+# Usage:
+#   bin/cache                -> flush all caches
+#   bin/cache flush          -> flush all caches
+#   bin/cache clean          -> clean all caches
+#   bin/cache status         -> show cache status
+#   bin/cache enable <type>  -> enable cache type
+#   bin/cache disable <type> -> disable cache type
+
+case "${1:-flush}" in
+    flush)
+        docker compose exec -u magento php php bin/magento cache:flush
+        ;;
+    clean)
+        docker compose exec -u magento php php bin/magento cache:clean
+        ;;
+    status)
+        docker compose exec -u magento php php bin/magento cache:status
+        ;;
+    enable)
+        shift
+        docker compose exec -u magento php php bin/magento cache:enable "$@"
+        ;;
+    disable)
+        shift
+        docker compose exec -u magento php php bin/magento cache:disable "$@"
+        ;;
+    *)
+        echo "Usage: bin/cache [flush|clean|status|enable|disable] [type]"
+        exit 1
+        ;;
+esac

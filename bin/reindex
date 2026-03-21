@@ -1,0 +1,27 @@
+#!/bin/bash
+# Magento indexer management shortcuts
+# Usage:
+#   bin/reindex              -> reindex all
+#   bin/reindex status       -> show indexer status
+#   bin/reindex reset        -> reset all indexers
+#   bin/reindex <indexer>    -> reindex specific indexer
+#   bin/reindex info         -> list available indexers
+
+case "${1:-all}" in
+    all)
+        docker compose exec -u magento php php bin/magento indexer:reindex
+        ;;
+    status)
+        docker compose exec -u magento php php bin/magento indexer:status
+        ;;
+    reset)
+        shift
+        docker compose exec -u magento php php bin/magento indexer:reset "$@"
+        ;;
+    info)
+        docker compose exec -u magento php php bin/magento indexer:info
+        ;;
+    *)
+        docker compose exec -u magento php php bin/magento indexer:reindex "$@"
+        ;;
+esac

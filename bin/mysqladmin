@@ -1,0 +1,7 @@
+#!/bin/bash
+# Run mysqladmin commands against the database
+# Examples:
+#   bin/mysqladmin status
+#   bin/mysqladmin processlist
+#   bin/mysqladmin variables | grep max_connections
+docker compose exec db mysqladmin -u root -p"${MYSQL_ROOT_PASSWORD:-magento}" "$@"

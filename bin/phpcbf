@@ -1,0 +1,6 @@
+#!/bin/bash
+# Run PHP Code Beautifier and Fixer inside the PHP container
+# Examples:
+#   bin/phpcbf app/code/MyVendor/MyModule/
+#   bin/phpcbf --standard=Magento2 app/code/
+docker compose exec -u magento php php vendor/bin/phpcbf "$@"

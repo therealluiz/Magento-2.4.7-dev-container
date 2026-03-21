@@ -1,0 +1,37 @@
+#!/bin/bash
+# Flush Redis databases used by Magento
+# Usage:
+#   bin/redis-flush          -> flush all 3 Magento DBs (cache, FPC, sessions)
+#   bin/redis-flush cache    -> flush only cache (db 0)
+#   bin/redis-flush fpc      -> flush only full page cache (db 1)
+#   bin/redis-flush sessions -> flush only sessions (db 2)
+#   bin/redis-flush all      -> flush ALL Redis databases
+
+set -e
+
+case "${1:-all-magento}" in
+    cache)
+        echo "Flushing Redis cache (db 0)..."
+        docker compose exec redis redis-cli -n 0 FLUSHDB
+        ;;
+    fpc)
+        echo "Flushing Redis full page cache (db 1)..."
+        docker compose exec redis redis-cli -n 1 FLUSHDB
+        ;;
+    sessions)
+        echo "Flushing Redis sessions (db 2)..."
+        docker compose exec redis redis-cli -n 2 FLUSHDB
+        ;;
+    all)
+        echo "Flushing ALL Redis databases..."
+        docker compose exec redis redis-cli FLUSHALL
+        ;;
+    *)
+        echo "Flushing Magento Redis databases (cache + FPC + sessions)..."
+        docker compose exec redis redis-cli -n 0 FLUSHDB
+        docker compose exec redis redis-cli -n 1 FLUSHDB
+        docker compose exec redis redis-cli -n 2 FLUSHDB
+        ;;
+esac
+
+echo "Done."

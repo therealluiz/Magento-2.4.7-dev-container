@@ -1,0 +1,6 @@
+#!/bin/bash
+# Run PHP CodeSniffer inside the PHP container
+# Examples:
+#   bin/phpcs app/code/MyVendor/MyModule/
+#   bin/phpcs --standard=Magento2 app/code/
+docker compose exec -u magento php php vendor/bin/phpcs "$@"

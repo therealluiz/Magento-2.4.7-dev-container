@@ -1,0 +1,26 @@
+#!/bin/bash
+# Remove all containers, volumes, and networks (WARNING: destroys data!)
+# Usage:
+#   bin/destroy              -> remove containers + networks (keep volumes)
+#   bin/destroy --volumes    -> remove everything including database data
+
+set -e
+
+echo "WARNING: This will destroy all containers and networks."
+if [ "$1" = "--volumes" ]; then
+    echo "         Including ALL DATA (database, opensearch, composer cache)."
+fi
+echo ""
+read -p "Are you sure? (y/N) " -n 1 -r
+echo
+
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    if [ "$1" = "--volumes" ]; then
+        docker compose down -v --remove-orphans
+    else
+        docker compose down --remove-orphans
+    fi
+    echo "Done."
+else
+    echo "Cancelled."
+fi

@@ -1,0 +1,22 @@
+#!/bin/bash
+# Export the Magento database to a timestamped SQL file
+# Usage:
+#   bin/db-export              -> magento_YYYYMMDD_HHMMSS.sql.gz
+#   bin/db-export --no-gzip    -> magento_YYYYMMDD_HHMMSS.sql
+set -e
+
+COMPOSE_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+DB_NAME="${MYSQL_DATABASE:-magento}"
+
+if [ "$1" = "--no-gzip" ]; then
+    OUTFILE="$COMPOSE_DIR/${DB_NAME}_${TIMESTAMP}.sql"
+    echo "Exporting database to $OUTFILE..."
+    docker compose exec -T db mysqldump -u "${MYSQL_USER:-magento}" -p"${MYSQL_PASSWORD:-magento}" --single-transaction "$DB_NAME" > "$OUTFILE"
+else
+    OUTFILE="$COMPOSE_DIR/${DB_NAME}_${TIMESTAMP}.sql.gz"
+    echo "Exporting database to $OUTFILE..."
+    docker compose exec -T db mysqldump -u "${MYSQL_USER:-magento}" -p"${MYSQL_PASSWORD:-magento}" --single-transaction "$DB_NAME" | gzip > "$OUTFILE"
+fi
+
+echo "Export complete: $OUTFILE ($(du -h "$OUTFILE" | cut -f1))"

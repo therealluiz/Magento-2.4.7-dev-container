@@ -1,0 +1,25 @@
+#!/bin/bash
+# Purge messages from a RabbitMQ queue
+# Usage:
+#   bin/rabbitmq-purge <queue_name>    -> purge specific queue
+#   bin/rabbitmq-purge --all           -> purge ALL queues
+
+set -e
+
+if [ "$1" = "--all" ]; then
+    echo "Purging ALL RabbitMQ queues..."
+    docker compose exec rabbitmq rabbitmqctl list_queues name --quiet | while read -r queue; do
+        queue=$(echo "$queue" | tr -d '[:space:]')
+        [ -n "$queue" ] && docker compose exec rabbitmq rabbitmqctl purge_queue "$queue" && echo "  Purged: $queue"
+    done
+elif [ -n "$1" ]; then
+    echo "Purging queue: $1"
+    docker compose exec rabbitmq rabbitmqctl purge_queue "$1"
+else
+    echo "Usage:"
+    echo "  bin/rabbitmq-purge <queue_name>   Purge a specific queue"
+    echo "  bin/rabbitmq-purge --all          Purge all queues"
+    exit 1
+fi
+
+echo "Done."

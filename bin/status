@@ -1,0 +1,3 @@
+#!/bin/bash
+# Show status of all containers with ports and health
+docker compose ps "$@"

@@ -1,0 +1,28 @@
+#!/bin/bash
+# Import a SQL file into the Magento database
+# Usage:
+#   bin/db-import backup.sql
+#   cat backup.sql | bin/db-import
+#   bin/db-import backup.sql.gz   (supports gzipped files)
+set -e
+
+if [ -n "$1" ]; then
+    FILE="$1"
+    if [ ! -f "$FILE" ]; then
+        echo "Error: File '$FILE' not found."
+        exit 1
+    fi
+
+    echo "Importing '$FILE' into database..."
+
+    if [[ "$FILE" == *.gz ]]; then
+        gunzip -c "$FILE" | docker compose exec -T db mysql -u "${MYSQL_USER:-magento}" -p"${MYSQL_PASSWORD:-magento}" "${MYSQL_DATABASE:-magento}"
+    else
+        docker compose exec -T db mysql -u "${MYSQL_USER:-magento}" -p"${MYSQL_PASSWORD:-magento}" "${MYSQL_DATABASE:-magento}" < "$FILE"
+    fi
+else
+    echo "Reading from stdin..."
+    docker compose exec -T db mysql -u "${MYSQL_USER:-magento}" -p"${MYSQL_PASSWORD:-magento}" "${MYSQL_DATABASE:-magento}"
+fi
+
+echo "Import complete."

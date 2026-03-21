@@ -1,0 +1,3 @@
+#!/bin/bash
+# List all RabbitMQ queues with message counts
+docker compose exec rabbitmq rabbitmqctl list_queues name messages consumers state "$@"

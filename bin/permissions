@@ -1,0 +1,17 @@
+#!/bin/bash
+# Fix Magento file and directory permissions
+set -e
+
+echo "Fixing file permissions..."
+docker compose exec -u root php find /var/www/html -type f -exec chmod 644 {} \;
+
+echo "Fixing directory permissions..."
+docker compose exec -u root php find /var/www/html -type d -exec chmod 755 {} \;
+
+echo "Setting writable directories..."
+docker compose exec -u root php chmod -R 777 /var/www/html/var /var/www/html/generated /var/www/html/pub/static /var/www/html/pub/media
+
+echo "Setting ownership..."
+docker compose exec -u root php chown -R magento:magento /var/www/html
+
+echo "Permissions fixed."

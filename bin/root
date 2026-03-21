@@ -1,0 +1,11 @@
+#!/bin/bash
+# Open a root shell inside a container
+# Usage:
+#   bin/root          -> root shell in PHP container
+#   bin/root php      -> root shell in PHP container
+#   bin/root db       -> root shell in MySQL container
+#   bin/root nginx    -> root shell in Nginx container
+#   bin/root redis    -> root shell in Redis container
+
+CONTAINER="${1:-php}"
+docker compose exec -u root "$CONTAINER" bash 2>/dev/null || docker compose exec -u root "$CONTAINER" sh
