@@ -1,0 +1,43 @@
+#!/bin/bash
+# Toggle SPX profiler on/off
+# Usage:
+#   bin/spx on   -> enable SPX web UI
+#   bin/spx off  -> disable SPX (default)
+#
+# When enabled, access the SPX web UI at:
+#   http://localhost/?SPX_KEY=dev&SPX_UI_URI=/
+#
+# To profile a specific request, append to URL:
+#   ?SPX_KEY=dev&SPX_ENABLED=1
+
+set -e
+
+MODE="${1:-on}"
+COMPOSE_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
+case "$MODE" in
+    on)   SPX_VAL="1" ;;
+    off)  SPX_VAL="0" ;;
+    *)
+        echo "Usage: bin/spx [on|off]"
+        exit 1
+        ;;
+esac
+
+echo "Setting SPX_ENABLED=$SPX_VAL"
+
+if [ -f "$COMPOSE_DIR/.env" ]; then
+    sed -i "s/^SPX_ENABLED=.*/SPX_ENABLED=$SPX_VAL/" "$COMPOSE_DIR/.env"
+fi
+
+# Restart PHP-FPM to pick up the change
+docker compose restart php
+
+if [ "$SPX_VAL" = "1" ]; then
+    echo ""
+    echo "SPX Profiler enabled!"
+    echo "  Web UI:   http://localhost/?SPX_KEY=dev&SPX_UI_URI=/"
+    echo "  Profile:  Add ?SPX_KEY=dev&SPX_ENABLED=1 to any URL"
+else
+    echo "SPX Profiler disabled."
+fi

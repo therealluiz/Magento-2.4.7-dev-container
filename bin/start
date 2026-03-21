@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+
+COMPOSE_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
+# Copy .env if it doesn't exist
+if [ ! -f "$COMPOSE_DIR/.env" ]; then
+    cp "$COMPOSE_DIR/.env.example" "$COMPOSE_DIR/.env"
+    echo "Created .env from .env.example — edit it with your Composer auth keys."
+fi
+
+echo "Starting Magento 2.4.7 dev environment..."
+docker compose -f "$COMPOSE_DIR/docker-compose.yml" up -d --build
+
+echo ""
+echo "Services:"
+echo "  Magento:      http://localhost"
+echo "  RabbitMQ UI:  http://localhost:15672 (magento/magento)"
+echo "  MailHog:      http://localhost:8025"
+echo "  OpenSearch:   http://localhost:9200"
+echo ""
+echo "Run 'bin/setup' for first-time Magento installation."

@@ -1,0 +1,151 @@
+#!/bin/bash
+set -e
+
+COMPOSE_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
+echo "============================================"
+echo " Magento 2.4.7 Setup"
+echo "============================================"
+echo ""
+
+# Check if .env exists
+if [ ! -f "$COMPOSE_DIR/.env" ]; then
+    cp "$COMPOSE_DIR/.env.example" "$COMPOSE_DIR/.env"
+    echo "Created .env from .env.example"
+fi
+
+# Source env vars
+set -a
+source "$COMPOSE_DIR/.env"
+set +a
+
+# Check COMPOSER_AUTH
+if [ -z "$COMPOSER_AUTH" ]; then
+    echo ""
+    echo "WARNING: COMPOSER_AUTH is not set in .env"
+    echo "You need Magento Marketplace keys to install."
+    echo "Get them at: https://marketplace.magento.com/customer/accessKeys/"
+    echo ""
+    echo "Set in .env:"
+    echo '  COMPOSER_AUTH={"http-basic":{"repo.magento.com":{"username":"PUBLIC_KEY","password":"PRIVATE_KEY"}}}'
+    echo ""
+    read -p "Continue without keys? (y/N) " -n 1 -r
+    echo
+    [[ ! $REPLY =~ ^[Yy]$ ]] && exit 1
+fi
+
+# Ensure services are running
+echo "Starting services..."
+docker compose -f "$COMPOSE_DIR/docker-compose.yml" up -d
+
+# Wait for MySQL
+echo "Waiting for MySQL to be ready..."
+until docker compose exec db mysqladmin ping -h localhost -u root -p"${MYSQL_ROOT_PASSWORD:-magento}" --silent 2>/dev/null; do
+    sleep 2
+done
+echo "MySQL is ready."
+
+# Wait for OpenSearch
+echo "Waiting for OpenSearch to be ready..."
+until docker compose exec opensearch curl -s http://localhost:9200/_cluster/health 2>/dev/null | grep -q '"status"'; do
+    sleep 2
+done
+echo "OpenSearch is ready."
+
+# Create Magento project if src/ doesn't exist or is empty
+if [ ! -f "$COMPOSE_DIR/src/composer.json" ]; then
+    echo ""
+    echo "Creating Magento 2.4.7 project..."
+    docker compose exec -u magento php composer create-project \
+        --repository-url=https://repo.magento.com/ \
+        magento/project-community-edition=2.4.7 \
+        /tmp/magento-install
+
+    # Move files into webroot
+    docker compose exec -u magento php bash -c "cp -a /tmp/magento-install/. /var/www/html/ && rm -rf /tmp/magento-install"
+
+    echo "Magento source files created."
+fi
+
+echo ""
+echo "Running Magento setup:install..."
+docker compose exec -u magento php php bin/magento setup:install \
+    --base-url="http://localhost" \
+    --db-host="db" \
+    --db-name="${MYSQL_DATABASE:-magento}" \
+    --db-user="${MYSQL_USER:-magento}" \
+    --db-password="${MYSQL_PASSWORD:-magento}" \
+    --admin-firstname="Admin" \
+    --admin-lastname="User" \
+    --admin-email="${ADMIN_EMAIL:-admin@example.com}" \
+    --admin-user="${ADMIN_USER:-admin}" \
+    --admin-password="${ADMIN_PASSWORD:-admin123}" \
+    --language="en_US" \
+    --currency="USD" \
+    --timezone="America/New_York" \
+    --use-rewrites=1 \
+    --search-engine="opensearch" \
+    --opensearch-host="opensearch" \
+    --opensearch-port=9200 \
+    --session-save="redis" \
+    --session-save-redis-host="redis" \
+    --session-save-redis-port=6379 \
+    --session-save-redis-db=2 \
+    --cache-backend="redis" \
+    --cache-backend-redis-server="redis" \
+    --cache-backend-redis-port=6379 \
+    --cache-backend-redis-db=0 \
+    --page-cache="redis" \
+    --page-cache-redis-server="redis" \
+    --page-cache-redis-port=6379 \
+    --page-cache-redis-db=1 \
+    --amqp-host="rabbitmq" \
+    --amqp-port=5672 \
+    --amqp-user="${RABBITMQ_USER:-magento}" \
+    --amqp-password="${RABBITMQ_PASSWORD:-magento}" \
+    --cleanup-database
+
+echo ""
+echo "Setting developer mode..."
+docker compose exec -u magento php php bin/magento deploy:mode:set developer
+
+echo ""
+echo "Disabling Two-Factor Auth for dev convenience..."
+docker compose exec -u magento php php bin/magento module:disable Magento_AdminAdobeImsTwoFactorAuth Magento_TwoFactorAuth
+docker compose exec -u magento php php bin/magento setup:upgrade
+
+echo ""
+echo "Running indexer..."
+docker compose exec -u magento php php bin/magento indexer:reindex
+
+echo ""
+echo "Flushing cache..."
+docker compose exec -u magento php php bin/magento cache:flush
+
+# Install sample data if requested
+if [ "${INSTALL_SAMPLE_DATA:-0}" = "1" ]; then
+    echo ""
+    echo "Installing sample data..."
+    docker compose exec -u magento php php bin/magento sampledata:deploy
+    docker compose exec -u magento php php bin/magento setup:upgrade
+fi
+
+echo ""
+echo "============================================"
+echo " Magento 2.4.7 is ready!"
+echo "============================================"
+echo ""
+echo "  Storefront:    http://localhost"
+echo "  Admin Panel:   http://localhost/admin"
+echo "  Admin User:    ${ADMIN_USER:-admin}"
+echo "  Admin Pass:    ${ADMIN_PASSWORD:-admin123}"
+echo ""
+echo "  RabbitMQ UI:   http://localhost:15672"
+echo "  MailHog:       http://localhost:8025"
+echo "  OpenSearch:    http://localhost:9200"
+echo ""
+echo "  Debugging:"
+echo "    bin/xdebug on       -> Enable step debugging (port 9003)"
+echo "    bin/xdebug profile  -> Enable Xdebug profiling"
+echo "    bin/spx on          -> Enable SPX profiler web UI"
+echo ""
