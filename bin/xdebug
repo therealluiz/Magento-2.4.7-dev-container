@@ -1,0 +1,38 @@
+#!/bin/bash
+# Toggle Xdebug mode on/off
+# Usage:
+#   bin/xdebug on       -> enable step debugging
+#   bin/xdebug off      -> disable (default)
+#   bin/xdebug profile  -> enable profiling (cachegrind output)
+#   bin/xdebug trace    -> enable function tracing
+
+set -e
+
+MODE="${1:-on}"
+
+case "$MODE" in
+    on|debug)  XDEBUG_MODE="debug" ;;
+    off)       XDEBUG_MODE="off" ;;
+    profile)   XDEBUG_MODE="profile" ;;
+    trace)     XDEBUG_MODE="trace" ;;
+    coverage)  XDEBUG_MODE="coverage" ;;
+    *)
+        echo "Usage: bin/xdebug [on|off|profile|trace|coverage]"
+        exit 1
+        ;;
+esac
+
+echo "Setting Xdebug mode to: $XDEBUG_MODE"
+
+# Update the environment variable and restart PHP-FPM
+docker compose exec -u root php bash -c "export XDEBUG_MODE=$XDEBUG_MODE && kill -USR2 1"
+
+# Also update .env for next restart
+COMPOSE_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+if [ -f "$COMPOSE_DIR/.env" ]; then
+    sed -i "s/^XDEBUG_MODE=.*/XDEBUG_MODE=$XDEBUG_MODE/" "$COMPOSE_DIR/.env"
+fi
+
+echo "Xdebug is now: $XDEBUG_MODE"
+[ "$XDEBUG_MODE" = "debug" ] && echo "Listening on port 9003 — start your IDE debugger."
+[ "$XDEBUG_MODE" = "profile" ] && echo "Cachegrind files will be saved to /tmp inside the container."

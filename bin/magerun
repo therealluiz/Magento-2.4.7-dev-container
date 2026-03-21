@@ -1,0 +1,8 @@
+#!/bin/bash
+# Run n98-magerun2 commands inside the PHP container
+# Examples:
+#   bin/magerun sys:info
+#   bin/magerun db:console
+#   bin/magerun cache:list
+#   bin/magerun dev:module:list
+docker compose exec -u magento php magerun2 "$@"

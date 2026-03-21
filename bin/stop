@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+
+COMPOSE_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
+echo "Stopping Magento 2.4.7 dev environment..."
+docker compose -f "$COMPOSE_DIR/docker-compose.yml" down "$@"

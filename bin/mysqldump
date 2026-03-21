@@ -1,0 +1,7 @@
+#!/bin/bash
+# Dump the Magento database to stdout
+# Examples:
+#   bin/mysqldump > backup.sql
+#   bin/mysqldump --no-data > schema.sql
+#   bin/mysqldump --single-transaction > backup.sql
+docker compose exec db mysqldump -u "${MYSQL_USER:-magento}" -p"${MYSQL_PASSWORD:-magento}" "${MYSQL_DATABASE:-magento}" "$@"

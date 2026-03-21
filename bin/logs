@@ -1,0 +1,22 @@
+#!/bin/bash
+# Tail container logs
+# Usage:
+#   bin/logs              -> all containers
+#   bin/logs php          -> PHP-FPM logs
+#   bin/logs nginx        -> Nginx logs
+#   bin/logs db           -> MySQL logs
+#   bin/logs opensearch   -> OpenSearch logs
+#   bin/logs redis        -> Redis logs
+#   bin/logs rabbitmq     -> RabbitMQ logs
+#   bin/logs mailhog      -> MailHog logs
+#   bin/logs magento      -> Magento system.log + exception.log
+
+if [ "$1" = "magento" ]; then
+    echo "Tailing Magento logs (Ctrl+C to stop)..."
+    docker compose exec -u magento php tail -f \
+        var/log/system.log \
+        var/log/exception.log \
+        var/log/debug.log 2>/dev/null
+else
+    docker compose logs -f "$@"
+fi

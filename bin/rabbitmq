@@ -1,0 +1,10 @@
+#!/bin/bash
+# Run rabbitmqctl commands
+# Examples:
+#   bin/rabbitmq status
+#   bin/rabbitmq list_queues
+#   bin/rabbitmq list_exchanges
+#   bin/rabbitmq list_connections
+#   bin/rabbitmq list_consumers
+#   bin/rabbitmq environment
+docker compose exec rabbitmq rabbitmqctl "$@"

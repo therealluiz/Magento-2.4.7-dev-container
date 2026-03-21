@@ -1,0 +1,7 @@
+#!/bin/bash
+# Run nginx commands
+# Examples:
+#   bin/nginx -t          -> test configuration
+#   bin/nginx -T          -> dump full config
+#   bin/nginx -s reload   -> reload config
+docker compose exec nginx nginx "$@"

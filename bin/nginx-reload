@@ -1,0 +1,8 @@
+#!/bin/bash
+# Test and reload Nginx configuration
+set -e
+echo "Testing Nginx configuration..."
+docker compose exec nginx nginx -t
+echo "Reloading Nginx..."
+docker compose exec nginx nginx -s reload
+echo "Nginx reloaded."

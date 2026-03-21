@@ -1,0 +1,10 @@
+#!/bin/bash
+# Run redis-cli commands
+# Examples:
+#   bin/redis                     -> interactive shell
+#   bin/redis ping                -> PONG
+#   bin/redis info memory         -> memory stats
+#   bin/redis dbsize              -> number of keys
+#   bin/redis keys "*"            -> list all keys (careful in prod)
+#   bin/redis monitor             -> real-time command monitoring
+docker compose exec redis redis-cli "$@"

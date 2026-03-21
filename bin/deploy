@@ -1,0 +1,8 @@
+#!/bin/bash
+# Deploy Magento static content
+# Usage:
+#   bin/deploy                           -> deploy for en_US
+#   bin/deploy en_US pt_BR               -> deploy multiple locales
+#   bin/deploy -f                        -> force deploy in developer mode
+#   bin/deploy --theme Magento/luma      -> deploy specific theme
+docker compose exec -u magento php php bin/magento setup:static-content:deploy "$@"

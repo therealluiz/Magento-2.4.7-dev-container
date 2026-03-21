@@ -1,0 +1,11 @@
+#!/bin/bash
+# Restart one or all services
+# Usage:
+#   bin/restart            -> restart all services
+#   bin/restart php        -> restart PHP-FPM only
+#   bin/restart nginx      -> restart Nginx only
+#   bin/restart db         -> restart MySQL only
+#   bin/restart opensearch -> restart OpenSearch only
+#   bin/restart redis      -> restart Redis only
+#   bin/restart rabbitmq   -> restart RabbitMQ only
+docker compose restart "$@"

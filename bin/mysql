@@ -1,0 +1,7 @@
+#!/bin/bash
+# Open MySQL client connected to the Magento database
+# Examples:
+#   bin/mysql                         -> interactive shell
+#   bin/mysql -e "SHOW TABLES"        -> run a query
+#   bin/mysql -e "SELECT * FROM core_config_data LIMIT 10"
+docker compose exec db mysql -u "${MYSQL_USER:-magento}" -p"${MYSQL_PASSWORD:-magento}" "${MYSQL_DATABASE:-magento}" "$@"

@@ -1,0 +1,7 @@
+#!/bin/bash
+# Run PHPUnit tests inside the PHP container
+# Examples:
+#   bin/phpunit vendor/magento/module-catalog/Test/Unit/
+#   bin/phpunit --filter testMethodName
+#   bin/phpunit -c dev/tests/unit/phpunit.xml.dist
+docker compose exec -u magento php php vendor/bin/phpunit "$@"

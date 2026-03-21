@@ -1,0 +1,24 @@
+#!/bin/bash
+# Magento module management
+# Usage:
+#   bin/module status                -> list all modules + status
+#   bin/module enable <Module_Name>  -> enable a module
+#   bin/module disable <Module_Name> -> disable a module
+
+case "${1:-status}" in
+    status)
+        docker compose exec -u magento php php bin/magento module:status
+        ;;
+    enable)
+        shift
+        docker compose exec -u magento php php bin/magento module:enable "$@"
+        ;;
+    disable)
+        shift
+        docker compose exec -u magento php php bin/magento module:disable "$@"
+        ;;
+    *)
+        echo "Usage: bin/module [status|enable|disable] [Module_Name]"
+        exit 1
+        ;;
+esac

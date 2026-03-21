@@ -1,0 +1,19 @@
+# Magento source (installed via composer)
+/src/
+
+# Environment config (contains credentials)
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker volumes (if any local)
+/data/

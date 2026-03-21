@@ -1,0 +1,8 @@
+#!/bin/bash
+# Run Grunt commands inside the PHP container (Magento frontend workflow)
+# Examples:
+#   bin/grunt clean
+#   bin/grunt exec:<theme>
+#   bin/grunt less:<theme>
+#   bin/grunt watch
+docker compose exec -u magento php npx grunt "$@"

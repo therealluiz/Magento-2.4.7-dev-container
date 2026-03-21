@@ -1,0 +1,3 @@
+#!/bin/bash
+# Run Magento dependency injection compilation
+docker compose exec -u magento php php bin/magento setup:di:compile "$@"

@@ -1,0 +1,8 @@
+#!/bin/bash
+# List all OpenSearch indices with details
+# Usage:
+#   bin/opensearch-indices              -> list all
+#   bin/opensearch-indices magento2*    -> filter by pattern
+PATTERN="${1:-*}"
+docker compose exec opensearch curl -s "http://localhost:9200/_cat/indices/${PATTERN}?v&s=index"
+echo ""

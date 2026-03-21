@@ -1,0 +1,15 @@
+#!/bin/bash
+# Query OpenSearch REST API
+# Examples:
+#   bin/opensearch                          -> cluster health
+#   bin/opensearch _cat/indices?v           -> list indices
+#   bin/opensearch _cat/nodes?v             -> list nodes
+#   bin/opensearch _cat/shards?v            -> list shards
+#   bin/opensearch _cluster/settings        -> cluster settings
+#   bin/opensearch my_index/_search         -> search an index
+
+ENDPOINT="${1:-_cluster/health?pretty}"
+shift 2>/dev/null
+
+docker compose exec opensearch curl -s "http://localhost:9200/${ENDPOINT}" "$@"
+echo ""

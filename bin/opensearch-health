@@ -1,0 +1,11 @@
+#!/bin/bash
+# Show OpenSearch cluster health and index summary
+set -e
+
+echo "=== Cluster Health ==="
+docker compose exec opensearch curl -s "http://localhost:9200/_cluster/health?pretty"
+
+echo ""
+echo "=== Indices ==="
+docker compose exec opensearch curl -s "http://localhost:9200/_cat/indices?v&s=index"
+echo ""

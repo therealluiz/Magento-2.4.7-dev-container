@@ -1,0 +1,27 @@
+#!/bin/bash
+# Run Magento cron jobs
+# Usage:
+#   bin/cron              -> run cron once
+#   bin/cron install      -> install crontab entries
+#   bin/cron remove       -> remove crontab entries
+#   bin/cron group <name> -> run specific cron group (e.g., index, default)
+
+case "${1:-run}" in
+    run)
+        docker compose exec -u magento php php bin/magento cron:run
+        ;;
+    install)
+        docker compose exec -u magento php php bin/magento cron:install
+        ;;
+    remove)
+        docker compose exec -u magento php php bin/magento cron:remove
+        ;;
+    group)
+        shift
+        docker compose exec -u magento php php bin/magento cron:run --group="$1"
+        ;;
+    *)
+        echo "Usage: bin/cron [run|install|remove|group <name>]"
+        exit 1
+        ;;
+esac

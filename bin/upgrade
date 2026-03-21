@@ -1,0 +1,6 @@
+#!/bin/bash
+# Run Magento setup:upgrade (database schema + data upgrades)
+# Usage:
+#   bin/upgrade              -> run setup:upgrade
+#   bin/upgrade --keep-generated -> preserve generated files
+docker compose exec -u magento php php bin/magento setup:upgrade "$@"

@@ -1,0 +1,3 @@
+#!/bin/bash
+# Run composer commands inside the PHP container
+docker compose exec -u magento php composer "$@"

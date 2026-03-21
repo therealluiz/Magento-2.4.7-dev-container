@@ -1,0 +1,18 @@
+#!/bin/bash
+# Tail Nginx access and error logs
+# Usage:
+#   bin/nginx-logs            -> both access + error logs
+#   bin/nginx-logs access     -> access log only
+#   bin/nginx-logs error      -> error log only
+
+case "${1:-both}" in
+    access)
+        docker compose exec nginx tail -f /var/log/nginx/access.log
+        ;;
+    error)
+        docker compose exec nginx tail -f /var/log/nginx/error.log
+        ;;
+    *)
+        docker compose exec nginx tail -f /var/log/nginx/access.log /var/log/nginx/error.log
+        ;;
+esac
