@@ -9,14 +9,47 @@ if [ ! -f "$COMPOSE_DIR/.env" ]; then
     echo "Created .env from .env.example — edit it with your Composer auth keys."
 fi
 
+# Update BASE_URL if a URL argument is provided
+if [ -n "$1" ]; then
+    STORE_URL="${1%/}"  # strip trailing slash
+    if grep -q "^BASE_URL=" "$COMPOSE_DIR/.env"; then
+        sed -i "s|^BASE_URL=.*|BASE_URL=${STORE_URL}|" "$COMPOSE_DIR/.env"
+    else
+        echo "BASE_URL=${STORE_URL}" >> "$COMPOSE_DIR/.env"
+    fi
+    echo "Store URL set to: ${STORE_URL}"
+fi
+
+# Source env vars for display
+set -a
+source "$COMPOSE_DIR/.env"
+set +a
+
+BASE_URL="${BASE_URL:-http://localhost}"
+RABBITMQ_MGMT_PORT="${RABBITMQ_MGMT_PORT:-15672}"
+MAILHOG_PORT="${MAILHOG_PORT:-8025}"
+OPENSEARCH_PORT="${OPENSEARCH_PORT:-9200}"
+SPX_KEY="${SPX_KEY:-dev}"
+
 echo "Starting Magento 2.4.7 dev environment..."
 docker compose -f "$COMPOSE_DIR/docker-compose.yml" up -d --build
 
+# Update Magento base URL if already installed
+if [ -f "$COMPOSE_DIR/src/bin/magento" ]; then
+    echo ""
+    echo "Updating Magento base URL to ${BASE_URL}..."
+    docker compose exec -u magento php php bin/magento config:set web/unsecure/base_url "${BASE_URL%/}/"
+    docker compose exec -u magento php php bin/magento config:set web/secure/base_url "${BASE_URL%/}/"
+    docker compose exec -u magento php php bin/magento cache:flush
+fi
+
 echo ""
 echo "Services:"
-echo "  Magento:      http://localhost"
-echo "  RabbitMQ UI:  http://localhost:15672 (magento/magento)"
-echo "  MailHog:      http://localhost:8025"
-echo "  OpenSearch:   http://localhost:9200"
+echo "  Magento:      ${BASE_URL}"
+echo "  Admin Panel:  ${BASE_URL}/admin"
+echo "  SPX Profiler: ${BASE_URL}/spx/ (key: ${SPX_KEY})"
+echo "  RabbitMQ UI:  http://localhost:${RABBITMQ_MGMT_PORT} (magento/magento)"
+echo "  MailHog:      http://localhost:${MAILHOG_PORT}"
+echo "  OpenSearch:   http://localhost:${OPENSEARCH_PORT}"
 echo ""
 echo "Run 'bin/setup' for first-time Magento installation."

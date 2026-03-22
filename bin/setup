@@ -70,7 +70,7 @@ fi
 echo ""
 echo "Running Magento setup:install..."
 docker compose exec -u magento php php bin/magento setup:install \
-    --base-url="http://localhost" \
+    --base-url="${BASE_URL:-http://localhost}/" \
     --db-host="db" \
     --db-name="${MYSQL_DATABASE:-magento}" \
     --db-user="${MYSQL_USER:-magento}" \
@@ -135,14 +135,14 @@ echo "============================================"
 echo " Magento 2.4.7 is ready!"
 echo "============================================"
 echo ""
-echo "  Storefront:    http://localhost"
-echo "  Admin Panel:   http://localhost/admin"
+echo "  Storefront:    ${BASE_URL:-http://localhost}"
+echo "  Admin Panel:   ${BASE_URL:-http://localhost}/admin"
 echo "  Admin User:    ${ADMIN_USER:-admin}"
 echo "  Admin Pass:    ${ADMIN_PASSWORD:-admin123}"
 echo ""
-echo "  RabbitMQ UI:   http://localhost:15672"
-echo "  MailHog:       http://localhost:8025"
-echo "  OpenSearch:    http://localhost:9200"
+echo "  RabbitMQ UI:   http://localhost:${RABBITMQ_MGMT_PORT:-15672}"
+echo "  MailHog:       http://localhost:${MAILHOG_PORT:-8025}"
+echo "  OpenSearch:    http://localhost:${OPENSEARCH_PORT:-9200}"
 echo ""
 echo "  Debugging:"
 echo "    bin/xdebug on       -> Enable step debugging (port 9003)"
